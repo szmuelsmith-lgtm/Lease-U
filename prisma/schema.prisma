@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  GUEST
+  HOST
+  ADMIN
+}
+
+enum ListingType {
+  SUBLET
+  LEASE_TAKEOVER
+  ROOM
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  REMOVED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  role          UserRole  @default(GUEST)
+  name          String?
+  email         String?   @unique
+  passwordHash  String?
+  emailVerified Boolean   @default(false)
+  eduVerified   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  listings     Listing[]
+  sentMessages Message[]  @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageReceiver")
+}
+
+model Listing {
+  id                  String        @id @default(cuid())
+  universitySlug      String
+  title               String
+  locationCity        String
+  locationState       String
+  priceDisplay        String
+  coverImageUrl       String
+  beds                Int
+  baths               Float
+  availableDate       DateTime
+  listingType         ListingType
+  description         String
+  verifiedStudentOnly Boolean       @default(false)
+  status              ListingStatus @default(PENDING)
+  hostId              String
+  createdAt           DateTime      @default(now())
+
+  host     User      @relation(fields: [hostId], references: [id])
+  messages Message[]
+  reports  Report[]
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  listingId  String
+  fromUserId String
+  toUserId   String
+  body       String
+  createdAt  DateTime @default(now())
+
+  listing   Listing @relation(fields: [listingId], references: [id])
+  fromUser  User    @relation("MessageSender", fields: [fromUserId], references: [id])
+  toUser    User    @relation("MessageReceiver", fields: [toUserId], references: [id])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  listingId  String
+  reason     String
+  createdAt  DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id])
+}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lease U - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #EEF2EE;
+            color: #0B0F1A;
+        }
+        .nav {
+            background: white;
+            border-bottom: 1px solid rgba(11,15,26,0.10);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #2F7D62;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .hero-split {
+            display: grid;
+            grid-template-columns: 42% 58%;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .hero-left {
+            background: #D7DFD5;
+            border-radius: 14px;
+            padding: 3rem;
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+        .hero-right {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .accent {
+            color: #2F7D62;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: #D7DFD5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        .card-content {
+            padding: 1.5rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: rgba(47,125,98,0.16);
+            color: #2F7D62;
+            margin-bottom: 0.5rem;
+        }
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        .text-muted {
+            color: rgba(11,15,26,0.55);
+            font-size: 0.875rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: #2F7D62;
+            color: white;
+            border-radius: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #25604a;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(11,15,26,0.10);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) {
+            .hero-split {
+                grid-template-columns: 1fr;
+            }
+            .hero-right {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="logo">
+            <div class="logo-icon">L</div>
+            <span>LeaseU.edu</span>
+        </div>
+        <div>
+            <a href="#" style="margin-right: 1rem; color: #0B0F1A; text-decoration: none;">Log In</a>
+            <a href="#" style="background: #2F7D62; color: white; padding: 0.5rem 1rem; border-radius: 14px; text-decoration: none;">Sign Up</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-split">
+            <!-- Left Hero Panel -->
+            <div class="hero-left">
+                <div style="background: #fbbf24; color: #0B0F1A; padding: 0.25rem 0.75rem; border-radius: 999px; display: inline-block; margin-bottom: 1rem; font-size: 0.75rem;">
+                    Made for FSU Students
+                </div>
+                <h1>Subletting made <span class="accent">easy</span></h1>
+                <p class="text-muted" style="margin-bottom: 2rem; line-height: 1.6;">
+                    The easiest way for FSU students to find lease takeovers, roommates, and housing near campus. Verified .edu emails only.
+                </p>
+                <input type="text" class="search-input" placeholder="Select your university">
+                <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 2rem;">
+                    <a href="#" style="color: #2F7D62;">Have a property to list? Post your listing here →</a>
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding-top: 2rem; border-top: 1px solid rgba(11,15,26,0.10);">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">150+</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Active Listings</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">2,400+</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Students Connected</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">&lt; 2hrs</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Avg Response</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">100%</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">FSU Verified</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Listings Feed -->
+            <div class="hero-right">
+                <div class="card">
+                    <div class="card-image">🏠</div>
+                    <div class="card-content">
+                        <span class="badge">Lease Takeover</span>
+                        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Urgent: Need Lease Takeover at Stadium Centre</h3>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📍 Tallahassee, FL</div>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📅 Available Jun 1</div>
+                        <div class="text-muted" style="margin-bottom: 1rem;">👥 2 beds · 2 baths</div>
+                        <div class="price">$750 /month</div>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image">🏠</div>
+                    <div class="card-content">
+                        <span class="badge">Room Rental</span>
+                        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Private Room in Quiet Townhouse</h3>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📍 Tallahassee, FL</div>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📅 Available May 15</div>
+                        <div class="text-muted" style="margin-bottom: 1rem;">👥 1 bed · 1 bath</div>
+                        <div class="price">$550 /month</div>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image">🏠</div>
+                    <div class="card-content">
+                        <span class="badge">Sublet</span>
+                        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Summer Sublease - The Standard</h3>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📍 Tallahassee, FL</div>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📅 Available May 1</div>
+                        <div class="text-muted" style="margin-bottom: 1rem;">👥 1 bed · 1 bath</div>
+                        <div class="price">$850 /month</div>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image">🏠</div>
+                    <div class="card-content">
+                        <span class="badge">Lease Takeover</span>
+                        <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Spacious 3BR House Near UF Campus</h3>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📍 Gainesville, FL</div>
+                        <div class="text-muted" style="margin-bottom: 0.5rem;">📅 Available Jun 15</div>
+                        <div class="text-muted" style="margin-bottom: 1rem;">👥 3 beds · 2 baths</div>
+                        <div class="price">$1,200 /month</div>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
