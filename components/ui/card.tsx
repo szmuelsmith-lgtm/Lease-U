@@ -2,14 +2,22 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+const cardVariants = {
+  default: "",
+  interactive:
+    "cursor-pointer hover:border-garnet hover:shadow-premium hover:-translate-y-0.5 transition-all duration-220",
+  boosted: "ring-2 ring-gold bg-gold/5",
+}
+
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & { variant?: keyof typeof cardVariants }
+>(({ className, variant = "default", ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border-soft bg-surface-card text-text-primary shadow-card",
+      "rounded-2xl border border-border bg-white text-foreground shadow-premium",
+      cardVariants[variant],
       className
     )}
     {...props}
@@ -50,7 +58,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-text-muted", className)}
+    className={cn("text-sm text-muted", className)}
     {...props}
   />
 ))

@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { createClient } from "@/lib/supabase/client"
 
 interface AuthModalProps {
   open: boolean
@@ -22,57 +23,58 @@ export function AuthModal({ open, onOpenChange, mode = "login" }: AuthModalProps
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return
     setError("")
     setLoading(true)
 
     if (isLogin) {
-      const result = await signIn("credentials", {
-        email,
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
         password,
-        redirect: false,
       })
 
-      if (result?.error) {
-        setError("Invalid email or password")
+      if (authError) {
+        const msg = authError.message
+        if (msg.includes("Invalid login credentials")) {
+          setError("Invalid email or password.")
+        } else if (msg.includes("Email not confirmed")) {
+          setError("Email not confirmed. Check your inbox or contact support.")
+        } else {
+          setError(msg)
+        }
         setLoading(false)
       } else {
         onOpenChange(false)
         router.refresh()
-        router.push("/host/dashboard")
       }
     } else {
-      try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
-        })
+      const { error: authError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: { name: name || email.split("@")[0] } },
+      })
 
-        const data = await res.json()
+      if (authError) {
+        setError(authError.message)
+        setLoading(false)
+        return
+      }
 
-        if (!res.ok) {
-          setError(data.error || "Signup failed")
-          setLoading(false)
-          return
-        }
+      // Auto login after signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      })
 
-        // Auto login after signup
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        })
-
-        if (result?.ok) {
-          onOpenChange(false)
-          router.refresh()
-          router.push("/host/dashboard")
-        }
-      } catch (err) {
-        setError("Something went wrong")
+      if (!signInError) {
+        onOpenChange(false)
+        router.refresh()
+      } else {
+        setError("Account created. Please log in.")
         setLoading(false)
       }
     }
@@ -121,9 +123,18 @@ export function AuthModal({ open, onOpenChange, mode = "login" }: AuthModalProps
               required
             />
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Loading..." : isLogin ? "Log In" : "Sign Up"}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {isLogin ? "Signing in…" : "Creating account…"}
+              </>
+            ) : isLogin ? (
+              "Log in"
+            ) : (
+              "Sign up"
+            )}
           </Button>
           <Button
             type="button"

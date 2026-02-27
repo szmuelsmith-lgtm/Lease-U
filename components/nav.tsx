@@ -1,102 +1,77 @@
 "use client"
 
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
+import { useAuth } from "@/app/providers"
 import { usePathname } from "next/navigation"
+import { motion } from "framer-motion"
+import { transitionBase } from "@/lib/motion"
+import { Button } from "@/components/ui/button"
+import { siteContent } from "@/content/siteContent"
+
+const navLinks = siteContent.nav.links
 
 export function Nav() {
-  const { data: session } = useSession()
+  const { user, profile, signOut } = useAuth()
   const pathname = usePathname()
 
-  const isActive = (path: string) => pathname === path
-
   return (
-    <nav className="border-b border-border-soft bg-surface-card">
-      <div className="container mx-auto px-4">
+    <motion.nav
+      initial={{ y: -12, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={transitionBase}
+      className="sticky top-0 z-50 border-b border-border bg-cream/80 backdrop-blur-md shadow-nav"
+    >
+      <div className="container mx-auto px-4 md:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-accent flex items-center justify-center">
-              <span className="text-white font-bold text-lg">L</span>
-            </div>
-            <span className="text-xl font-semibold">LeaseU.edu</span>
+          <Link href="/" className="flex items-center gap-1 font-bold text-xl text-foreground">
+            <span className="text-garnet">{siteContent.brand.name[0]}</span>
+            <span className="text-gold">{siteContent.brand.name[1]}</span>
           </Link>
 
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                isActive("/")
-                  ? "bg-accent text-white"
-                  : "hover:bg-accent-soft text-text-primary"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/u/fsu"
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                isActive("/u/fsu") || pathname?.startsWith("/u/")
-                  ? "bg-accent text-white"
-                  : "hover:bg-accent-soft text-text-primary"
-              }`}
-            >
-              Browse
-            </Link>
-            <Link
-              href="/host/new"
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                isActive("/host/new") || pathname?.startsWith("/host/")
-                  ? "bg-accent text-white"
-                  : "hover:bg-accent-soft text-text-primary"
-              }`}
-            >
-              Post
-            </Link>
-            <Link
-              href="/messages"
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                isActive("/messages")
-                  ? "bg-accent text-white"
-                  : "hover:bg-accent-soft text-text-primary"
-              }`}
-            >
-              Messages
-            </Link>
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map(({ href, label }) => {
+              const isActive = pathname === href
+              return (
+                <Link key={href} href={href}>
+                  <span
+                    className={`relative block px-5 py-2.5 rounded-radius-xl text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "text-garnet bg-gold/30"
+                        : "text-muted hover:text-foreground hover:bg-gold/10"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              )
+            })}
           </div>
 
-          <div className="flex items-center gap-4">
-            {session ? (
+          <div className="flex items-center gap-3">
+            {user ? (
               <>
-                <span className="text-sm text-text-muted">
-                  {session.user.name || session.user.email}
-                </span>
-                {session.user.role === "ADMIN" && (
-                  <Link href="/admin">
-                    <Button variant="outline" size="sm">
-                      Admin
-                    </Button>
-                  </Link>
+                {profile?.role === "ADMIN" && (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/admin">{siteContent.nav.admin}</Link>
+                  </Button>
                 )}
-                <Button variant="outline" size="sm" onClick={() => signOut()}>
-                  Log Out
+                <Button variant="outline" size="sm" onClick={signOut}>
+                  {siteContent.nav.logOut}
                 </Button>
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Log In
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm">Sign Up</Button>
-                </Link>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">{siteContent.nav.logIn}</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/signup">{siteContent.nav.signUp}</Link>
+                </Button>
               </>
             )}
           </div>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   )
 }

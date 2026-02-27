@@ -2,17 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+:root {
+  --garnet: #8B1E3F;
+  --garnet-dark: #7A1735;
+  --gold: #C9A227;
+  --background: #F8F9FC;
+  --foreground: #14151A;
+  --border: #E7E9F0;
+  --ring: rgba(139, 30, 63, 0.35);
+}
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
   body {
-    @apply bg-bg_right text-text_primary;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }

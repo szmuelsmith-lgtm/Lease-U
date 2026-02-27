@@ -1,41 +1,32 @@
-import { Nav } from "@/components/nav"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
+import { transformMessage } from "@/lib/transforms"
 import { redirect } from "next/navigation"
-import { MessageSquare } from "lucide-react"
+import { Nav } from "@/components/nav"
+import { MessagesClient } from "@/components/messages-client"
 
 export default async function MessagesPage() {
-  const session = await getServerSession(authOptions)
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/login?callbackUrl=/messages")
 
-  if (!session) {
-    redirect("/login")
-  }
+  const { data: rows } = await supabase
+    .from("messages")
+    .select(`
+      *,
+      listing:listings!listing_id(id, title),
+      from_user:profiles!from_user_id(id, email),
+      to_user:profiles!to_user_id(id, email)
+    `)
+    .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+    .order("created_at", { ascending: false })
+
+  const messages = (rows ?? []).map(transformMessage)
 
   return (
-    <div className="min-h-screen bg-bg_right">
+    <div className="min-h-screen bg-background">
       <Nav />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-serif font-bold mb-2">Messages</h1>
-          <p className="text-text-muted mb-8">
-            Connect with other students about listings.
-          </p>
-
-          <Card>
-            <CardContent className="p-12 text-center">
-              <MessageSquare className="h-16 w-16 mx-auto mb-4 text-text-muted" />
-              <h2 className="text-xl font-semibold mb-2">No messages yet</h2>
-              <p className="text-text-muted mb-6">
-                When you contact a listing poster or someone messages you, your conversations will appear here.
-              </p>
-              <Button asChild>
-                <a href="/u/fsu">Browse Listings</a>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="container mx-auto px-4 md:px-8 py-12">
+        <MessagesClient messages={messages} currentUserId={user.id} />
       </div>
     </div>
   )

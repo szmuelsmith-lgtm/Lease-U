@@ -1,167 +1,80 @@
-import { Nav } from "@/components/nav"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { prisma } from "@/lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
+import { getSiteSettings } from "@/lib/site-settings"
+import { transformListing, transformReport } from "@/lib/transforms"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ApproveActions } from "@/components/approve-actions"
+import { AdminClient } from "@/components/admin-client"
+import { Nav } from "@/components/nav"
+import { siteContent } from "@/content/siteContent"
 
-export default async function AdminDashboard() {
-  const session = await getServerSession(authOptions)
+export const dynamic = "force-dynamic"
 
-  if (!session || session.user.role !== "ADMIN") {
-    redirect("/")
+export default async function AdminPage() {
+  const session = await getSession()
+  if (!session?.user) redirect("/login?callbackUrl=/admin")
+
+  if (session.profile?.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Nav />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold text-foreground mb-2">{siteContent.admin.notAuthorizedTitle}</h1>
+          <p className="text-muted mb-6">{siteContent.admin.notAuthorizedDescription}</p>
+          <Link href="/browse" className="text-garnet font-medium hover:underline">
+            {siteContent.admin.notAuthorizedLink}
+          </Link>
+        </div>
+      </div>
+    )
   }
 
-  const pending = await prisma.listing.findMany({
-    where: { status: "PENDING" },
-    include: { host: { select: { name: true, email: true } } },
-    orderBy: { createdAt: "desc" },
-  })
+  const supabase = createClient()
 
-  const approved = await prisma.listing.findMany({
-    where: { status: "APPROVED" },
-    include: { host: { select: { name: true, email: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  })
+  const [pendingRes, approvedRes, removedRes, reportsRes, siteSettings] = await Promise.all([
+    supabase
+      .from("listings")
+      .select("*, host:profiles!host_id(id, email)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("listings")
+      .select("*, host:profiles!host_id(id, email)")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("listings")
+      .select("*, host:profiles!host_id(id, email)")
+      .eq("status", "removed")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("reports")
+      .select("*, listing:listings(*, host:profiles!host_id(id, email)), reporter:profiles!reporter_id(id, email)")
+      .order("created_at", { ascending: false }),
+    getSiteSettings(),
+  ])
 
-  const removed = await prisma.listing.findMany({
-    where: { status: "REMOVED" },
-    include: { host: { select: { name: true, email: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  })
+  const pending = (pendingRes.data ?? []).map(transformListing)
+  const approved = (approvedRes.data ?? []).map(transformListing)
+  const removed = (removedRes.data ?? []).map(transformListing)
+  const reports = (reportsRes.data ?? []).map(transformReport)
 
   return (
-    <div className="min-h-screen bg-bg_right">
-      <Nav />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-serif font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-text-muted mb-8">Moderate listings and manage the platform</p>
-
-        <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="pending">
-              Pending ({pending.length})
-            </TabsTrigger>
-            <TabsTrigger value="approved">
-              Approved ({approved.length})
-            </TabsTrigger>
-            <TabsTrigger value="removed">
-              Removed ({removed.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="pending" className="space-y-4">
-            {pending.map((listing) => (
-              <Card key={listing.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-semibold">{listing.title}</h3>
-                        <Badge variant="secondary">PENDING</Badge>
-                      </div>
-                      <p className="text-text-muted mb-2">
-                        {listing.locationCity}, {listing.locationState} · {listing.priceDisplay}
-                      </p>
-                      <p className="text-sm text-text-muted">
-                        Posted by {listing.host.name || listing.host.email} ·{" "}
-                        {new Date(listing.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <ApproveActions listingId={listing.id} />
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/listing/${listing.id}`}>View</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {pending.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center text-text-muted">
-                  No pending listings
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="approved" className="space-y-4">
-            {approved.map((listing) => (
-              <Card key={listing.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-semibold">{listing.title}</h3>
-                        <Badge variant="default">APPROVED</Badge>
-                      </div>
-                      <p className="text-text-muted mb-2">
-                        {listing.locationCity}, {listing.locationState} · {listing.priceDisplay}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="destructive" size="sm" asChild>
-                        <Link href={`/api/admin/listings/${listing.id}/remove`}>Remove</Link>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/listing/${listing.id}`}>View</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {approved.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center text-text-muted">
-                  No approved listings
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="removed" className="space-y-4">
-            {removed.map((listing) => (
-              <Card key={listing.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-semibold">{listing.title}</h3>
-                        <Badge variant="destructive">REMOVED</Badge>
-                      </div>
-                      <p className="text-text-muted mb-2">
-                        {listing.locationCity}, {listing.locationState} · {listing.priceDisplay}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/listing/${listing.id}`}>View</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {removed.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center text-text-muted">
-                  No removed listings
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+    <div className="min-h-screen bg-background">
+      <AdminClient
+        pending={pending}
+        approved={approved}
+        removed={removed}
+        reports={reports}
+        siteSettings={siteSettings}
+      />
     </div>
   )
 }

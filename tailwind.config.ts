@@ -1,93 +1,75 @@
 import type { Config } from "tailwindcss"
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
-  prefix: "",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       colors: {
-        bg_left: "#D7DFD5",
-        bg_right: "#EEF2EE",
-        text_primary: "#0B0F1A",
-        text_muted: "rgba(11,15,26,0.55)",
-        surface_card: "#FFFFFF",
-        border_soft: "rgba(11,15,26,0.10)",
-        accent: "#2F7D62",
-        accent_soft: "rgba(47,125,98,0.16)",
-        border: "rgba(11,15,26,0.10)",
-        input: "rgba(11,15,26,0.10)",
-        ring: "#2F7D62",
-        background: "#FFFFFF",
-        foreground: "#0B0F1A",
-        primary: {
-          DEFAULT: "#2F7D62",
-          foreground: "#FFFFFF",
-        },
-        secondary: {
-          DEFAULT: "#EEF2EE",
-          foreground: "#0B0F1A",
-        },
-        destructive: {
-          DEFAULT: "#ef4444",
-          foreground: "#FFFFFF",
-        },
-        muted: {
-          DEFAULT: "rgba(11,15,26,0.55)",
-          foreground: "#0B0F1A",
-        },
-        popover: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#0B0F1A",
-        },
-        card: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#0B0F1A",
-        },
-      },
-      borderRadius: {
-        lg: "14px",
-        md: "calc(14px - 2px)",
-        sm: "calc(14px - 4px)",
-        pill: "999px",
-      },
-      boxShadow: {
-        card: "0 10px 26px rgba(0,0,0,0.08)",
-        input: "0 8px 20px rgba(0,0,0,0.08)",
+        garnet: "#8B1E3F",
+        garnetDark: "#7A1735",
+        "garnet-dark": "#7A1735",
+        gold: "#C9A227",
+        cream: "#F8F9FC",
+        background: "#F8F9FC",
+        foreground: "#14151A",
+        surface: "#FFFFFF",
+        "surface-2": "#F3F4F8",
+        muted: "#5B606C",
+        "text-subtle": "#7B8190",
+        border: "#E7E9F0",
+        "border-strong": "#D8DBE6",
+        "garnet-muted": "rgba(139,30,63,0.12)",
+        "primary-100": "#F4E7EC",
+        "primary-300": "#C96A86",
+        "accent-100": "#FBF4DD",
+        "accent-600": "#B28C1F",
+        primary: { DEFAULT: "#8B1E3F", foreground: "#FFFFFF" },
+        secondary: { DEFAULT: "#FFFFFF", foreground: "#8B1E3F" },
+        accent: { DEFAULT: "#C9A227", foreground: "#8B1E3F" },
+        ring: "rgba(139,30,63,0.35)",
+        success: "#1F8A4C",
+        warning: "#B7791F",
+        danger: "#C2413B",
+        info: "#2563EB",
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
+        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        serif: ["var(--font-playfair)", "Playfair Display", "serif"],
       },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
+      fontSize: {
+        "display-lg": ["3.5rem", { lineHeight: "1.05" }],
+        "display-md": ["2.5rem", { lineHeight: "1.1" }],
+        "display-sm": ["2.25rem", { lineHeight: "1.1" }],
+        "section": ["1.75rem", { lineHeight: "1.2" }],
       },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+      boxShadow: {
+        card: "0 1px 2px rgba(16,24,40,0.06)",
+        soft: "0 1px 2px rgba(16,24,40,0.06)",
+        premium: "0 4px 14px rgba(16,24,40,0.10)",
+        premiumHover: "0 10px 30px rgba(16,24,40,0.12)",
+        "card-premium": "0 4px 14px rgba(16,24,40,0.10)",
+        "card-hover": "0 10px 30px rgba(16,24,40,0.12)",
+        elevated: "0 4px 20px rgba(139,30,63,0.12)",
+        nav: "0 1px 0 rgba(16,24,40,0.04), 0 4px 12px rgba(16,24,40,0.03)",
+      },
+      transitionDuration: {
+        "220": "220ms",
+      },
+      borderRadius: {
+        "radius-xl": "14px",
+        "radius-2xl": "18px",
+        xl: "14px",
+        "2xl": "18px",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+}
 
 export default config

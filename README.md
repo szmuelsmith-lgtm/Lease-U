@@ -1,209 +1,69 @@
-# Lease U - Campus Housing Made Easy
+# LeaseU - FSU Campus Housing
 
-A production-quality web application for students to find lease takeovers, roommates, and housing near campus. Built with Next.js 14, TypeScript, Tailwind CSS, Prisma, and NextAuth.
+Modern, sleek FSU-exclusive housing marketplace. Made for Florida State University students.
 
 ## Features
 
-- **Guest Mode**: Browse listings and view details without an account
-- **Host Functionality**: Create and manage property listings
-- **Admin Dashboard**: Moderate listings, approve/reject submissions
-- **University-First**: Browse listings by university (FSU, UF, UCF)
-- **Modern UI**: Zublet-style split hero layout with smooth animations
-- **Responsive Design**: Works seamlessly on desktop and mobile
+- **View-first**: Anyone can browse listings. Sign in to post or message.
+- **FSU hosts only**: Only verified @fsu.edu users can post listings.
+- **Viewer accounts**: Any email can sign up to browse and message hosts.
+- **Admin**: Approve/reject/remove listings. Login: `admin-temp` / `leaseu-admin`
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui (Radix UI primitives)
-- **Animations**: Framer Motion
-- **Database**: Prisma + SQLite
-- **Authentication**: NextAuth.js (Credentials provider)
-- **Validation**: Zod
-- **Forms**: React Hook Form
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- Prisma + SQLite
+- Zod
+- React Hook Form
+- Credentials-based auth (NextAuth)
 
-## Getting Started
+## Setup
 
-### Prerequisites
+```bash
+npm install
+npx prisma db push
+npm run db:seed
+npm run dev
+```
 
-- Node.js 18+ and npm/yarn/pnpm
-- Git
+## Environment
 
-### Installation
-
-1. **Clone the repository** (or navigate to the project directory)
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Set up the database**:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-
-4. **Seed the database** with sample data:
-   ```bash
-   npm run db:seed
-   ```
-
-5. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-6. **Open your browser** and navigate to [http://localhost:3000](http://localhost:3000)
-
-## Database Setup
-
-The application uses SQLite for local development. The database file will be created at `prisma/dev.db` after running `prisma db push`.
-
-### Seed Data
-
-The seed script creates:
-- Admin user (login: `admin-temp` / password: `leaseu-admin`)
-- Host users with sample listings for FSU, UF, and UCF
-- Mix of listing types (Sublet, Lease Takeover, Room Rental)
-- Various statuses (Approved, Pending)
-
-### Database Commands
-
-- `npm run db:push` - Push schema changes to database
-- `npm run db:seed` - Seed database with sample data
-- `npm run db:studio` - Open Prisma Studio (database GUI)
-
-## Authentication
-
-### Guest Mode (Default)
-- No account required
-- Can browse all listings
-- Prompted to login/signup when attempting to contact hosts or post listings
-
-### Host Account
-- Sign up with email and password
-- Create and manage listings
-- View inquiries/messages
-
-### Admin Access
-- Username: `admin-temp`
-- Password: `leaseu-admin`
-- Access admin dashboard at `/admin`
-- Approve/reject/remove listings
-
-## Project Structure
+Copy `.env.example` to `.env`:
 
 ```
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes
-│   ├── admin/             # Admin dashboard
-│   ├── host/              # Host pages (dashboard, create listing)
-│   ├── listing/           # Listing detail pages
-│   ├── u/                 # University feed pages
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   └── ...               # Custom components
-├── lib/                   # Utility functions
-│   ├── auth.ts           # NextAuth configuration
-│   ├── db.ts             # Prisma client
-│   └── utils.ts          # Helper functions
-├── prisma/               # Prisma schema and migrations
-│   ├── schema.prisma     # Database schema
-│   └── seed.ts           # Seed script
-└── middleware.ts         # Route guards
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
 ```
+
+## Seed Accounts
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin-temp | leaseu-admin | Admin |
+| student@fsu.edu | host123 | Host (can post) |
+| viewer@gmail.com | viewer123 | Viewer (browse & message) |
 
 ## Routes
 
-- `/` - Landing page with split hero and featured listings
-- `/u/:slug` - University feed (fsu, uf, ucf)
-- `/listing/:id` - Listing detail page
-- `/login` - Login page
-- `/signup` - Signup page
-- `/host/dashboard` - Host dashboard (protected)
-- `/host/new` - Create new listing (protected)
-- `/host/listings/:id/edit` - Edit listing (protected)
-- `/admin` - Admin moderation dashboard (protected)
-- `/messages` - Messages/inquiries (protected)
+| Route | Access |
+|-------|--------|
+| / | Landing (public) |
+| /browse | Browse listings (public) |
+| /listings/[id] | Listing detail (public) |
+| /post | Post listing (HOST only, @fsu.edu) |
+| /messages | Messages (auth required) |
+| /admin | Admin dashboard (ADMIN only) |
+| /login | Log in |
+| /signup | Sign up |
 
-## Design System
+## Branding
 
-### Colors
-- `bg_left`: #D7DFD5 (Left hero panel)
-- `bg_right`: #EEF2EE (Right feed background)
-- `text_primary`: #0B0F1A
-- `text_muted`: rgba(11,15,26,0.55)
-- `surface_card`: #FFFFFF
-- `border_soft`: rgba(11,15,26,0.10)
-- `accent`: #2F7D62 (Primary green)
-- `accent_soft`: rgba(47,125,98,0.16)
-
-### Typography
-- **Headlines**: Playfair Display (serif)
-- **UI Text**: Inter (sans-serif)
-
-### Animations
-- Page transitions: Fade + slide (cubic-bezier easing)
-- Listing cards: Stagger fade-up on load
-- Card hover: Lift 3px with stronger shadow
-- Search typeahead: Scale + fade from top
-
-## Development
-
-### Adding New Features
-
-1. Create database migrations if needed:
-   ```bash
-   npx prisma migrate dev --name your-feature-name
-   ```
-
-2. Update Prisma schema if needed:
-   ```bash
-   npx prisma db push
-   ```
-
-3. Generate Prisma client after schema changes:
-   ```bash
-   npx prisma generate
-   ```
-
-### Code Style
-
-- Use TypeScript for type safety
-- Follow Next.js App Router conventions
-- Use server components by default, client components when needed
-- Validate inputs with Zod schemas
-- Use shadcn/ui components for consistent UI
-
-## Production Deployment
-
-1. **Update environment variables**:
-   - Set `DATABASE_URL` to your production database
-   - Set `NEXTAUTH_SECRET` to a secure random string
-   - Set `NEXTAUTH_URL` to your production URL
-
-2. **Run migrations**:
-   ```bash
-   npx prisma migrate deploy
-   ```
-
-3. **Build the application**:
-   ```bash
-   npm run build
-   ```
-
-4. **Start the production server**:
-   ```bash
-   npm start
-   ```
-
-## License
-
-This project is built for educational purposes.
-
-## Support
-
-For issues or questions, please check the codebase or create an issue in the repository.
+- Primary Garnet: #782F40
+- Dark Garnet: #5A1F2B
+- Gold Accent: #CEB888
+- Background: #F6F4EF

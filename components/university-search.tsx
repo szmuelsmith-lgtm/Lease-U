@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { motion, AnimatePresence } from "framer-motion"
+import { easeOutCubic } from "@/lib/motion"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
 
@@ -52,7 +53,7 @@ export function UniversitySearch() {
   return (
     <div className="relative w-full max-w-md" ref={inputRef}>
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted" />
         <Input
           type="text"
           placeholder="Select your university"
@@ -68,23 +69,23 @@ export function UniversitySearch() {
       <AnimatePresence>
         {isOpen && filtered.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            initial={{ opacity: 0, scale: 0.98, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
-            className="absolute top-full mt-2 w-full bg-surface-card border border-border-soft rounded-lg shadow-card z-50 overflow-hidden"
+            exit={{ opacity: 0, scale: 0.98, y: -4 }}
+            transition={{ duration: 0.28, ease: easeOutCubic }}
+            className="absolute top-full mt-2 w-full bg-white border border-border rounded-xl shadow-card-premium z-50 overflow-hidden"
           >
             {filtered.map((uni, index) => (
               <button
                 key={uni.slug}
                 onClick={() => handleSelect(uni.slug)}
                 onMouseEnter={() => setFocusedIndex(index)}
-                className={`w-full text-left px-4 py-3 hover:bg-accent-soft transition-colors ${
-                  focusedIndex === index ? "bg-accent-soft" : ""
+                className={`w-full text-left px-4 py-3 hover:bg-garnet-muted transition-colors duration-200 ${
+                  focusedIndex === index ? "bg-garnet-muted" : ""
                 }`}
               >
                 <div className="font-medium">{uni.name}</div>
-                <div className="text-sm text-text-muted">{uni.city}</div>
+                <div className="text-sm text-muted">{uni.city}</div>
               </button>
             ))}
           </motion.div>

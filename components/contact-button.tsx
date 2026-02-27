@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { AuthModal } from "./auth-modal"
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/app/providers"
 import { useRouter } from "next/navigation"
 
 interface ContactButtonProps {
@@ -20,7 +20,7 @@ export function ContactButton({
   isAuthenticated,
 }: ContactButtonProps) {
   const [showAuth, setShowAuth] = useState(false)
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
 
   if (isOwner) {
@@ -34,10 +34,7 @@ export function ContactButton({
   if (!isAuthenticated) {
     return (
       <>
-        <Button
-          className="w-full"
-          onClick={() => setShowAuth(true)}
-        >
+        <Button className="w-full" onClick={() => setShowAuth(true)}>
           Contact Host
         </Button>
         <AuthModal open={showAuth} onOpenChange={setShowAuth} />
@@ -46,7 +43,6 @@ export function ContactButton({
   }
 
   const handleContact = async () => {
-    // In a real app, this would open a message dialog or navigate to messages
     router.push(`/messages?listing=${listingId}`)
   }
 

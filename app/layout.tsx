@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
 
 export const metadata: Metadata = {
-  title: "Lease U - Campus Housing Made Easy",
-  description: "The easiest way for students to find lease takeovers, roommates, and housing near campus.",
+  title: "LeaseU - FSU Campus Housing",
+  description: "Find your perfect campus housing. Made for Florida State University students.",
 }
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable}`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

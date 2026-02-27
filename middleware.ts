@@ -1,59 +1,26 @@
-import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { updateSession } from "@/lib/supabase/middleware"
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const path = req.nextUrl.pathname
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+  const { user, response } = await updateSession(req)
 
-    // Admin routes
-    if (path.startsWith("/admin")) {
-      if (token?.role !== "ADMIN") {
-        return NextResponse.redirect(new URL("/", req.url))
-      }
+  if (pathname.startsWith("/admin")) {
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", req.url))
     }
-
-    // Host routes
-    if (path.startsWith("/host")) {
-      if (token?.role !== "HOST" && token?.role !== "ADMIN") {
-        return NextResponse.redirect(new URL("/login", req.url))
-      }
-    }
-
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const path = req.nextUrl.pathname
-
-        // Allow public routes
-        if (
-          path === "/" ||
-          path.startsWith("/u/") ||
-          path.startsWith("/listing/") ||
-          path === "/login" ||
-          path === "/signup" ||
-          path.startsWith("/api/")
-        ) {
-          return true
-        }
-
-        // Require auth for protected routes
-        if (path.startsWith("/admin")) {
-          return token?.role === "ADMIN"
-        }
-
-        if (path.startsWith("/host")) {
-          return token?.role === "HOST" || token?.role === "ADMIN"
-        }
-
-        return true
-      },
-    },
   }
-)
+
+  if ((pathname.startsWith("/post") || pathname === "/messages") && !user) {
+    return NextResponse.redirect(new URL("/login", req.url))
+  }
+
+  return response
+}
 
 export const config = {
-  matcher: ["/admin/:path*", "/host/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 }
